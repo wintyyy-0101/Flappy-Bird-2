@@ -23,7 +23,7 @@ let groundY = 580;
 let groundOffset = 0;
 let scale = 1;
 
-// 🧮 Responsive scaling
+// 🧮 Responsive scaling with balanced physics
 function resizeCanvas() {
   const designWidth = 400;
   const designHeight = 600;
@@ -33,9 +33,10 @@ function resizeCanvas() {
   canvas.height = rect.height;
   groundY = canvas.height - 20 * scale;
 
-  // 🪶 Adjust physics for screen height
-  gravity = baseGravity * scale * 1.2;
-  flap = baseFlap * scale * 1.2;
+  // ⚙️ Adjust physics relative to height (not raw scale)
+  const heightRatio = canvas.height / designHeight;
+  gravity = baseGravity * heightRatio * 0.9; // slightly lighter gravity
+  flap = baseFlap * heightRatio * 0.7;       // softer flap for mobile
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
