@@ -1,11 +1,11 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const scoreDisplay = document.getElementById('score');
-const startBtn = document.getElementById('startBtn');
-const overlay = document.getElementById('overlay');
-const restartBtn = document.getElementById('restartBtn');
-const finalScore = document.getElementById('finalScore');
-const title = document.getElementById('title');
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreDisplay = document.getElementById("score");
+const startBtn = document.getElementById("startBtn");
+const overlay = document.getElementById("overlay");
+const restartBtn = document.getElementById("restartBtn");
+const finalScore = document.getElementById("finalScore");
+const title = document.getElementById("title");
 
 let bird = { x: 80, y: 300, r: 18, vy: 0, frame: 0 };
 let baseGravity = 0.5;
@@ -22,8 +22,9 @@ let started = false;
 let groundY = 580;
 let groundOffset = 0;
 let scale = 1;
+let pipeSpeed = 3;
+let pipeGap = 150;
 
-// 🧮 Responsive scaling with balanced physics
 function resizeCanvas() {
   const designWidth = 400;
   const designHeight = 600;
@@ -33,16 +34,17 @@ function resizeCanvas() {
   canvas.height = rect.height;
   groundY = canvas.height - 20 * scale;
 
-  // ⚙️ Adjust physics relative to height (not raw scale)
   const heightRatio = canvas.height / designHeight;
-  gravity = baseGravity * heightRatio * 0.9; // slightly lighter gravity
-  flap = baseFlap * heightRatio * 0.7;       // softer flap for mobile
+  gravity = baseGravity * heightRatio * 0.8;
+  flap = baseFlap * heightRatio * 0.65;
+  pipeSpeed = 3 * heightRatio * 0.9;
+  pipeGap = 150 * heightRatio * 1.1;
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 function drawBackground() {
-  let sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
   sky.addColorStop(0, "#6ec6ff");
   sky.addColorStop(1, "#b3e5fc");
   ctx.fillStyle = sky;
@@ -51,41 +53,41 @@ function drawBackground() {
   ctx.fillStyle = "rgba(255,255,255,0.8)";
   clouds.forEach(cloud => {
     ctx.beginPath();
-    ctx.ellipse(cloud.x, cloud.y, cloud.size * 2 * scale, cloud.size * scale, 0, 0, Math.PI * 2);
+    ctx.ellipse(cloud.x, cloud.y, cloud.size * 2, cloud.size, 0, 0, Math.PI * 2);
     ctx.fill();
   });
 
-  // ground
   ctx.fillStyle = "#8d6e63";
-  ctx.fillRect(0, groundY, canvas.width, 40 * scale);
+  ctx.fillRect(0, groundY, canvas.width, 40);
   ctx.fillStyle = "#6d4c41";
-  for (let i = 0; i < canvas.width / (40 * scale) + 1; i++) {
-    ctx.fillRect((i * 40 * scale + groundOffset) % canvas.width, groundY, 20 * scale, 40 * scale);
+  for (let i = 0; i < canvas.width / 40 + 1; i++) {
+    ctx.fillRect((i * 40 + groundOffset) % canvas.width, groundY, 20, 40);
   }
 }
 
 function drawBird() {
   ctx.save();
-  ctx.translate(bird.x * scale, bird.y * scale);
+  ctx.translate(bird.x, bird.y);
   ctx.rotate(bird.vy * 0.04);
 
   ctx.fillStyle = "#ffeb3b";
   ctx.shadowColor = "rgba(0,0,0,0.4)";
   ctx.shadowBlur = 8;
   ctx.beginPath();
-  ctx.arc(0, 0, bird.r * scale, 0, Math.PI * 2);
+  ctx.arc(0, 0, bird.r, 0, Math.PI * 2);
   ctx.fill();
 
-  let wingY = Math.sin(bird.frame / 5) * 3 * scale;
+  let wingY = Math.sin(bird.frame / 5) * 3;
   ctx.beginPath();
   ctx.fillStyle = "#f4b400";
-  ctx.ellipse(-5 * scale, wingY + 5 * scale, 8 * scale, 4 * scale, Math.PI / 6, 0, Math.PI * 2);
+  ctx.ellipse(-5, wingY + 5, 8, 4, Math.PI / 6, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.beginPath();
   ctx.fillStyle = "#000";
-  ctx.arc(7 * scale, -4 * scale, 3 * scale, 0, Math.PI * 2);
+  ctx.arc(7, -4, 3, 0, Math.PI * 2);
   ctx.fill();
+
   ctx.restore();
 }
 
@@ -101,18 +103,17 @@ function drawPipes() {
 }
 
 function drawExplosion() {
-  explosions.forEach((ex, index) => {
+  explosions.forEach((ex, i) => {
     ctx.beginPath();
     ctx.fillStyle = `rgba(255, ${200 + ex.life}, 0, ${ex.alpha})`;
-    ctx.arc(ex.x * scale, ex.y * scale, ex.size * scale, 0, Math.PI * 2);
+    ctx.arc(ex.x, ex.y, ex.size, 0, Math.PI * 2);
     ctx.fill();
     ex.size += 2;
     ex.alpha -= 0.04;
-    if (ex.alpha <= 0) explosions.splice(index, 1);
+    if (ex.alpha <= 0) explosions.splice(i, 1);
   });
 }
 
-// 🧠 Game loop
 function update() {
   if (!started) return;
   frame++;
@@ -120,44 +121,37 @@ function update() {
   bird.vy += gravity;
   bird.y += bird.vy;
   groundOffset -= 2 * scale;
-  if (groundOffset <= -40 * scale) groundOffset = 0;
+  if (groundOffset <= -40) groundOffset = 0;
 
-  // spawn pipes
   if (frame % 90 === 0) {
     let top = Math.random() * 250 + 50;
-    pipes.push({ x: canvas.width, width: 60 * scale, top: top * scale, gap: 150 * scale, passed: false });
+    pipes.push({ x: canvas.width, width: 60 * scale, top, gap: pipeGap, passed: false });
   }
 
-  pipes.forEach(pipe => (pipe.x -= 3 * scale));
+  pipes.forEach(pipe => (pipe.x -= pipeSpeed));
   clouds.forEach(cloud => (cloud.x -= 1.2 * scale));
 
   if (frame % 120 === 0)
     clouds.push({ x: canvas.width, y: Math.random() * 200 + 20, size: Math.random() * 20 + 20 });
   if (clouds.length && clouds[0].x < -50) clouds.shift();
 
-  // ✅ SCORING: increase when bird passes a pipe
   pipes.forEach(pipe => {
-    if (!pipe.passed && bird.x * scale > pipe.x + pipe.width) {
+    if (
+      bird.x + bird.r > pipe.x &&
+      bird.x - bird.r < pipe.x + pipe.width &&
+      (bird.y - bird.r < pipe.top || bird.y + bird.r > pipe.top + pipe.gap)
+    ) {
+      triggerExplosion();
+      endGame();
+    }
+    if (!pipe.passed && pipe.x + pipe.width < bird.x) {
       pipe.passed = true;
       score++;
       scoreDisplay.textContent = score;
     }
   });
 
-  // collisions
-  pipes.forEach(pipe => {
-    if (
-      bird.x * scale + bird.r * scale > pipe.x &&
-      bird.x * scale - bird.r * scale < pipe.x + pipe.width &&
-      (bird.y * scale - bird.r * scale < pipe.top ||
-       bird.y * scale + bird.r * scale > pipe.top + pipe.gap)
-    ) {
-      triggerExplosion();
-      endGame();
-    }
-  });
-
-  if (bird.y * scale + bird.r * scale > groundY || bird.y - bird.r < 0) {
+  if (bird.y + bird.r > groundY || bird.y - bird.r < 0) {
     triggerExplosion();
     endGame();
   }
@@ -171,13 +165,14 @@ function draw() {
   drawPipes();
   drawBird();
   drawExplosion();
+
   ctx.save();
-  ctx.font = `${16 * scale}px Poppins, sans-serif`;
+  ctx.font = "16px Poppins, sans-serif";
   ctx.fillStyle = "#fff";
   ctx.shadowColor = "rgba(0,0,0,0.5)";
   ctx.shadowBlur = 3;
   ctx.textAlign = "center";
-  ctx.fillText("Made By: Bit", canvas.width / 2, canvas.height - 10 * scale);
+  ctx.fillText("Made By: Bit", canvas.width / 2, canvas.height - 10);
   ctx.restore();
 }
 
@@ -216,8 +211,8 @@ function reset() {
 function startGame() {
   reset();
   started = true;
-  title.style.display = "none";  // 🚫 hide title on start
   startBtn.style.display = "none";
+  title.style.display = "none";
   update();
 }
 
@@ -229,4 +224,3 @@ startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", startGame);
 window.addEventListener("keydown", e => { if (e.code === "Space") flapBird(); });
 window.addEventListener("mousedown", flapBird);
-window.addEventListener("touchstart", flapBird); // 👆 mobile tap support
