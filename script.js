@@ -231,4 +231,3 @@ window.addEventListener("mousedown", flapBird);
 
 
 
-
