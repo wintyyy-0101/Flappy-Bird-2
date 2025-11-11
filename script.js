@@ -27,12 +27,12 @@ let pipeGap = 150;
 
 function resizeCanvas() {
 gravity = baseGravity * heightRatio * 0.75;  // gentler gravity for smoother glide
-flap = baseFlap * heightRatio * 0.9;        // keep good jump strength
+flap = baseFlap * heightRatio * 0.95;        // keep good jump strength
 pipeSpeed = 3 * heightRatio * 0.95;          // same balanced pipe speed
 pipeGap = 150 * heightRatio * 1.1;           // fair gap size
 
 gravity = baseGravity * heightRatio * 0.75;  // gentler gravity for smoother glide
-flap = baseFlap * heightRatio * 0.9;        // keep good jump strength
+flap = baseFlap * heightRatio * 0.95;        // keep good jump strength
 pipeSpeed = 3 * heightRatio * 0.95;          // same balanced pipe speed
 pipeGap = 150 * heightRatio * 1.1;           // fair gap size
 }
@@ -220,6 +220,7 @@ startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", startGame);
 window.addEventListener("keydown", e => { if (e.code === "Space") flapBird(); });
 window.addEventListener("mousedown", flapBird);
+
 
 
 
