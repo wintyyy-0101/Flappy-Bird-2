@@ -26,16 +26,15 @@ let pipeSpeed = 3;
 let pipeGap = 150;
 
 function resizeCanvas() {
-  gravity = baseGravity * heightRatio * 0.9;  // a touch stronger gravity
-flap = baseFlap * heightRatio * 0.85;       // stronger jump impulse
-pipeSpeed = 3 * heightRatio * 0.95;         // smoother pipe flow
-pipeGap = 150 * heightRatio * 1.1;          // fair gap spacing
+gravity = baseGravity * heightRatio * 0.75;  // gentler gravity for smoother glide
+flap = baseFlap * heightRatio * 0.85;        // keep good jump strength
+pipeSpeed = 3 * heightRatio * 0.95;          // same balanced pipe speed
+pipeGap = 150 * heightRatio * 1.1;           // fair gap size
 
-  const heightRatio = canvas.height / designHeight;
-  gravity = baseGravity * heightRatio * 0.8;
-  flap = baseFlap * heightRatio * 0.65;
-  pipeSpeed = 3 * heightRatio * 0.9;
-  pipeGap = 150 * heightRatio * 1.1;
+gravity = baseGravity * heightRatio * 0.75;  // gentler gravity for smoother glide
+flap = baseFlap * heightRatio * 0.85;        // keep good jump strength
+pipeSpeed = 3 * heightRatio * 0.95;          // same balanced pipe speed
+pipeGap = 150 * heightRatio * 1.1;           // fair gap size
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -221,4 +220,5 @@ startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", startGame);
 window.addEventListener("keydown", e => { if (e.code === "Space") flapBird(); });
 window.addEventListener("mousedown", flapBird);
+
 
