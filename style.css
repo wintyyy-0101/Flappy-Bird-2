@@ -20,6 +20,10 @@ canvas {
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   background: linear-gradient(to bottom, #87ceeb 0%, #b0e0e6 100%);
+  width: 90vw;
+  max-width: 400px;
+  height: auto;
+  aspect-ratio: 2 / 3;
 }
 
 .ui {
@@ -96,53 +100,4 @@ canvas {
   cursor: pointer;
   box-shadow: 0 3px 0 #2e7d32;
   transition: 0.2s;
-}
-
-#startScreen {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.5);
-  z-index: 10;
-}
-
-.startBox {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 40px 50px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-}
-
-.startBox h1 {
-  font-size: 36px;
-  margin-bottom: 25px;
-  color: #222;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-}
-
-.startBox button {
-  padding: 14px 30px;
-  font-size: 20px;
-  font-weight: bold;
-  background: linear-gradient(135deg, #ffca28, #ffc107);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 5px 0 #f57f17;
-  transition: 0.2s;
-}
-
-.startBox button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 7px 0 #f57f17;
-}
-/* --- Mobile responsiveness --- */
-canvas {
-  width: 90vw;             /* shrink to 90% of viewport width */
-  max-width: 400px;        /* keep desktop size cap */
-  height: auto;            /* maintain aspect ratio */
-  aspect-ratio: 2 / 3;     /* ~400×600 ratio */
 }
